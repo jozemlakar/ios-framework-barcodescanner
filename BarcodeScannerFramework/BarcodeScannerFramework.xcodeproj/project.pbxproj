@@ -294,7 +294,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = BarcodeScannerFramework;
 				SKIP_INSTALL = YES;
-				"VALID_ARCHS[sdk=*]" = "arm64 armv7 armv7s x86";
+				"VALID_ARCHS[sdk=*]" = "arm64 armv7 armv7s x86 x86_64";
 			};
 			name = Debug;
 		};
@@ -313,7 +313,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = BarcodeScannerFramework;
 				SKIP_INSTALL = YES;
-				"VALID_ARCHS[sdk=*]" = "arm64 armv7 armv7s x86";
+				"VALID_ARCHS[sdk=*]" = "arm64 armv7 armv7s x86 x86_64";
 			};
 			name = Release;
 		};

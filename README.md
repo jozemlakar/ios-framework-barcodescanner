@@ -4,8 +4,34 @@ I'm using this wrapper framework so I could use the built-in scanning capabiliti
 within my [NativeScript BarcodeScanner plugin](https://www.npmjs.com/package/nativescript-barcodescanner).
 
 ### Note to self: building the framework
-- Run the target for simulator and device (disconnect the device to be sure), make sure to not only build for the active architecture
-- Right-click the file in the Products folder and open in Finder
-- In a Terminal `cd` to that folder, move up to the `Products` folder
-- Run `lipo -create -output "BarcodeScannerFramework" "Debug-iphonesimulator/BarcodeScannerFramework.framework/BarcodeScannerFramework" "Debug-iphoneos/BarcodeScannerFramework.framework/BarcodeScannerFramework"`
-- Use the resulting `BarcodeScannerFramework` file instead of the one generated inside any of the target
+- Open terminal and then
+cd BarcodeScannerFramework
+# https://developer.apple.com/forums/thread/666335
+rm -rf ./archives
+# archive iPhone 64
+xcodebuild archive -scheme BarcodeScannerFramework -arch arm64 -configuration Release SKIP_INSTALL=NO -sdk "iphoneos" BUILD_LIBRARY_FOR_DISTRIBUTION=YES -archivePath ./archives/ios.xcarchive 
+# archive simulator arm64 M1
+xcodebuild archive -scheme BarcodeScannerFramework -arch arm64 -configuration Release SKIP_INSTALL=NO -sdk iphonesimulator BUILD_LIBRARY_FOR_DISTRIBUTION=YES -archivePath ./archives/sim64.xcarchive
+# archive simulator x86_64
+xcodebuild archive -scheme BarcodeScannerFramework -arch x86_64 -configuration Release SKIP_INSTALL=NO -sdk iphonesimulator BUILD_LIBRARY_FOR_DISTRIBUTION=YES -archivePath ./archives/simx86.xcarchive
+    
+# create xcframework for iOS and iOS Simulator
+xcodebuild -create-xcframework \
+-framework "./archives/ios.xcarchive/Products/Library/Frameworks/BarcodeScannerFramework.framework" \
+-framework "./archives/sim64.xcarchive/Products/Library/Frameworks/BarcodeScannerFramework.framework" \
+-output "./archives/BarcodeScannerFramework.xcframework"
+
+# add the x86 slice to the iOS simulator
+lipo -create \
+"./archives/BarcodeScannerFramework.xcframework/ios-arm64-simulator/BarcodeScannerFramework.framework/BarcodeScannerFramework" \ 
+"./archives/simx86.xcarchive/Products/Library/Frameworks/BarcodeScannerFramework.framework/BarcodeScannerFramework"  \
+-output "./archives/BarcodeScannerFramework.xcframework/ios-arm64-simulator/BarcodeScannerFramework.framework/BarcodeScannerFramework"
+
+# check that the resulting Simulator has both slices (arm64 and x86_64)
+lipo -detailed_info "./archives/BarcodeScannerFramework.xcframework/ios-arm64-simulator/BarcodeScannerFramework.framework/BarcodeScannerFramework"
+
+# add the architecture to remove warnings
+- open ./archives/BarcodeScannerFramework.xcframework/ios-arm64-simulator/BarcodeScannerFramework.framework/Info.plist and find SupportedArchitectures in ios-arm64-simulator library. Add <string>x86_64</string> after <string>arm64</string>.
+- Do not add this ot the ios-arm64 library
+
+Use resulting ./archives/BarcodeScannerFramework.xcframework as your framework.
