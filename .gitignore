@@ -2,4 +2,4 @@
 project.xcworkspace
 xcuserdata
 build
-BarcodeScannerFramework/archives
+dist
